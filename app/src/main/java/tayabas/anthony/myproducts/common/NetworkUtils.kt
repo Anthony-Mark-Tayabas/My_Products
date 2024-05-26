@@ -6,6 +6,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 class NetworkUtils {
+
     companion object {
         fun resolveError(e: Exception): State.ErrorState {
             var error = e
@@ -39,4 +40,5 @@ class NetworkUtils {
             return State.ErrorState(error)
         }
     }
+
 }

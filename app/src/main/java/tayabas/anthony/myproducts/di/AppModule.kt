@@ -12,6 +12,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
     @Singleton
     @Provides
     fun provideApplication(@ApplicationContext app: Context): MyProductsApplication {
@@ -23,4 +24,5 @@ object AppModule {
     fun provideContext(application: MyProductsApplication): Context {
         return application.applicationContext
     }
+
 }

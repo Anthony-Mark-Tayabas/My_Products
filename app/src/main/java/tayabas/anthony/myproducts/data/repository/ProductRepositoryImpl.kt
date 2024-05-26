@@ -10,9 +10,11 @@ import javax.inject.Inject
 class ProductRepositoryImpl @Inject constructor(
     private val productApi: ProductApi
 ) : ProductRepository {
+
     override suspend fun getProducts(): Response<ProductResponse> {
         return withContext(Dispatchers.IO) {
             productApi.getProducts()
         }
     }
+
 }

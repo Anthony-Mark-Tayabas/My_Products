@@ -18,11 +18,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
     private const val READ_TIMEOUT = 60
     private const val WRITE_TIMEOUT = 60
     private const val CONNECTION_TIMEOUT = 60
     private const val CACHE_SIZE_BYTES = 10 * 1024 * 1024L //10 MB
-    private const val LOCAL_HOST = "localhost:8080/"
+    private const val LOCAL_SERVER_URL = "192.168.254.121" // Update to local device IP Address of LocalHost
+    private const val LOCAL_HOST = "http://$LOCAL_SERVER_URL:8080/"
 
     @Singleton
     @Provides
@@ -68,4 +70,5 @@ object NetworkModule {
     fun provideProductApi(retrofit: Retrofit): ProductApi {
         return retrofit.create(ProductApi::class.java)
     }
+
 }
