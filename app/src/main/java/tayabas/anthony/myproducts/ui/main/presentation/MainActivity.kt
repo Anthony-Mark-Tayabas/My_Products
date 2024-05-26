@@ -25,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import tayabas.anthony.myproducts.common.State
 import tayabas.anthony.myproducts.data.remote.dto.ProductResponse
-import tayabas.anthony.myproducts.ui.component.product.ProductListPage
+import tayabas.anthony.myproducts.ui.product.ProductListPage
 import tayabas.anthony.myproducts.ui.main.viewmodel.ProductViewModel
 import tayabas.anthony.myproducts.ui.theme.MyProductsTheme
 

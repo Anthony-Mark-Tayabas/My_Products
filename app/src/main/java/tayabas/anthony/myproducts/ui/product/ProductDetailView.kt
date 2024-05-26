@@ -1,4 +1,4 @@
-package tayabas.anthony.myproducts.ui.component.product
+package tayabas.anthony.myproducts.ui.product
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
