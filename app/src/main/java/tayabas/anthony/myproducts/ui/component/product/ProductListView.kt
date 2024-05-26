@@ -5,16 +5,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,34 +30,142 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import tayabas.anthony.myproducts.R
 import tayabas.anthony.myproducts.data.entity.Product
+import tayabas.anthony.myproducts.data.entity.SortOrder
 
 @Composable
 fun ProductListPage(productList: ArrayList<Product>) {
     val filteredProductList by remember { mutableStateOf(productList) }
+    val productTypes = filteredProductList.map { it.type }.distinct()
+
     var searchText by remember { mutableStateOf("") }
+    var sortOrder by remember {
+        mutableStateOf(SortOrder.NO_ORDER)
+    }
+    var selectedType by remember {
+        mutableStateOf("")
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        FilterComposable()
-        SearchComposable(searchText = searchText, onSearchTextChange = { searchText = it })
-        ProductGrid(filteredProductList.filter {
-            it.name.contains(searchText, ignoreCase = true)
-        })
+        SearchWidget(searchText = searchText, onSearchTextChange = { searchText = it })
+        SortPriceWidget(currentOrder = sortOrder) {
+            sortOrder = when (sortOrder) {
+                SortOrder.ASCENDING -> SortOrder.DESCENDING
+                SortOrder.DESCENDING,
+                SortOrder.NO_ORDER -> SortOrder.ASCENDING
+            }
+        }
+        FilterTypeWidget(productTypes = productTypes, selectedType = selectedType) {
+            selectedType = it
+        }
+
+        val sortedProductList = remember(searchText, sortOrder, selectedType) {
+            when (sortOrder) {
+                SortOrder.ASCENDING -> {
+                    filteredProductList
+                        .filter {
+                            it.name.contains(searchText, ignoreCase = true)
+                        }
+                        .filter {
+                            it.type.contains(selectedType, ignoreCase = true)
+                        }
+                        .sortedBy { it.price }
+                }
+
+                SortOrder.DESCENDING -> {
+                    filteredProductList
+                        .filter {
+                            it.name.contains(searchText, ignoreCase = true)
+                        }
+                        .filter {
+                            it.type.contains(selectedType, ignoreCase = true)
+                        }
+                        .sortedByDescending { it.price }
+                }
+
+                SortOrder.NO_ORDER -> {
+                    filteredProductList
+                        .filter {
+                            it.name.contains(searchText, ignoreCase = true)
+                        }
+                        .filter {
+                            it.type.contains(selectedType, ignoreCase = true)
+                        }
+                }
+            }
+        }
+
+        ProductGrid(productList = sortedProductList)
     }
 }
 
 @Composable
-fun FilterComposable() {
-    // Implement your filter logic here
+fun SortPriceWidget(currentOrder: SortOrder, onSortChanged: () -> Unit) {
+    val order = when (currentOrder) {
+        SortOrder.ASCENDING -> "Highest to lowest"
+        SortOrder.DESCENDING,
+        SortOrder.NO_ORDER -> "Lowest to highest"
+    }
+    OutlinedButton(
+        onClick = onSortChanged,
+    ) {
+        Text(
+            text = "Sort price: $order",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+    }
 }
 
 @Composable
-fun SearchComposable(searchText: String, onSearchTextChange: (String) -> Unit) {
+fun FilterTypeWidget(productTypes: List<String>, selectedType: String, onSelectedTypeChanged: (String) -> Unit) {
+    Row(modifier = Modifier
+        .padding(bottom = 8.dp)) {
+        if (selectedType.isNotEmpty()) {
+            TextButton(onClick = { onSelectedTypeChanged("") }) {
+                Text(
+                    text = "clear",
+                    style = MaterialTheme.typography.bodySmall,
+                    textDecoration = TextDecoration.Underline,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
+
+        LazyRow {
+            items(productTypes) { type ->
+                OutlinedButton(
+                    onClick = { onSelectedTypeChanged(type) },
+                    modifier = Modifier.padding(end = 4.dp)
+                ) {
+                    Text(
+                        text = type.toLowerCase(Locale.current),
+                        style = if (type == selectedType) MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight
+                                .Bold
+                        ) else MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight
+                                .Normal
+                        ),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchWidget(searchText: String, onSearchTextChange: (String) -> Unit) {
     var text by remember { mutableStateOf(searchText) }
     TextField(
         value = text,
