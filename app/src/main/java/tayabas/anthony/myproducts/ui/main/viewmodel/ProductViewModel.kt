@@ -22,7 +22,7 @@ class ProductViewModel @Inject constructor(private val productRepository: Produc
         viewModelScope.launch {
             try {
                 _products.update { State.LoadingState }
-                _products.update { State.DataState(productRepository.getProducts()) }
+                _products.update { State.DataState(productRepository.getProducts().body() ?: arrayListOf()) }
             } catch (e: Exception) {
                 _products.update { NetworkUtils.resolveError(e) }
             }

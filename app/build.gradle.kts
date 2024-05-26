@@ -88,4 +88,7 @@ dependencies {
 
     // Lifecycle Aware
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // Coil
+    implementation(libs.coil.compose)
 }
