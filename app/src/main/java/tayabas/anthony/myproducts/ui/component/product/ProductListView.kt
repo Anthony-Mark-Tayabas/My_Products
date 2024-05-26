@@ -1,6 +1,7 @@
 package tayabas.anthony.myproducts.ui.component.product
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,9 +82,16 @@ fun ProductGrid(productList: List<Product>) {
 
 @Composable
 fun ProductGridItem(product: Product) {
+    val displayDetails = remember {
+        mutableStateOf(false)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                displayDetails.value = true
+            }
     ) {
         Box {
             AsyncImage(
@@ -102,17 +110,23 @@ fun ProductGridItem(product: Product) {
             ) {
                 Text(
                     text = product.name,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(horizontal = 2.dp, vertical = 1.dp)
                 )
                 Text(
                     text = "$${product.price}",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(horizontal = 2.dp, vertical = 1.dp)
                 )
             }
+        }
+    }
+
+    if (displayDetails.value) {
+        ProductDetailView(product = product) {
+            displayDetails.value = false
         }
     }
 }
