@@ -8,7 +8,6 @@ open class NetworkErrorException (
     val errorMessage: String,
     val response: String = ""
 ) : Exception() {
-
     override val message: String?
         get() = super.message
 
