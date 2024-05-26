@@ -33,7 +33,7 @@ import tayabas.anthony.myproducts.data.entity.SortOrder
 
 @Composable
 fun ProductListPage(productList: ArrayList<Product>) {
-    val filteredProductList by remember { mutableStateOf(productList) }
+    var filteredProductList by remember { mutableStateOf(productList) }
     val productTypes = filteredProductList.map { it.type }.distinct()
 
     var searchText by remember { mutableStateOf("") }
@@ -59,40 +59,42 @@ fun ProductListPage(productList: ArrayList<Product>) {
             selectedType = it
         }
 
-        val sortedProductList = remember(searchText, sortOrder, selectedType) {
-            when (sortOrder) {
-                SortOrder.ASCENDING -> {
-                    filteredProductList
-                        .filter {
-                            it.name.contains(searchText, ignoreCase = true)
-                        }
-                        .filter {
-                            it.type.contains(selectedType, ignoreCase = true)
-                        }
-                        .sortedBy { it.price }
-                }
+        val sortedProductList by remember(searchText, sortOrder, selectedType) {
+            mutableStateOf(
+                when (sortOrder) {
+                    SortOrder.ASCENDING -> {
+                        filteredProductList
+                            .filter {
+                                it.name.contains(searchText, ignoreCase = true)
+                            }
+                            .filter {
+                                it.type.contains(selectedType, ignoreCase = true)
+                            }
+                            .sortedBy { it.price }
+                    }
 
-                SortOrder.DESCENDING -> {
-                    filteredProductList
-                        .filter {
-                            it.name.contains(searchText, ignoreCase = true)
-                        }
-                        .filter {
-                            it.type.contains(selectedType, ignoreCase = true)
-                        }
-                        .sortedByDescending { it.price }
-                }
+                    SortOrder.DESCENDING -> {
+                        filteredProductList
+                            .filter {
+                                it.name.contains(searchText, ignoreCase = true)
+                            }
+                            .filter {
+                                it.type.contains(selectedType, ignoreCase = true)
+                            }
+                            .sortedByDescending { it.price }
+                    }
 
-                SortOrder.NO_ORDER -> {
-                    filteredProductList
-                        .filter {
-                            it.name.contains(searchText, ignoreCase = true)
-                        }
-                        .filter {
-                            it.type.contains(selectedType, ignoreCase = true)
-                        }
+                    SortOrder.NO_ORDER -> {
+                        filteredProductList
+                            .filter {
+                                it.name.contains(searchText, ignoreCase = true)
+                            }
+                            .filter {
+                                it.type.contains(selectedType, ignoreCase = true)
+                            }
+                    }
                 }
-            }
+            )
         }
 
         ProductGrid(productList = sortedProductList)

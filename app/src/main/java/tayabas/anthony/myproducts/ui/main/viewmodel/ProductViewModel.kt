@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tayabas.anthony.myproducts.common.NetworkUtils
 import tayabas.anthony.myproducts.common.State
+import tayabas.anthony.myproducts.data.entity.Product
+import tayabas.anthony.myproducts.data.remote.dto.ProductResponse
 import tayabas.anthony.myproducts.data.repository.ProductRepository
 import javax.inject.Inject
 
@@ -16,7 +18,7 @@ import javax.inject.Inject
 class ProductViewModel @Inject constructor(private val productRepository: ProductRepository): ViewModel() {
 
     private val _products = MutableStateFlow<State<Any>>(State.LoadingState)
-    val product get() = _products.asStateFlow()
+    val products get() = _products.asStateFlow()
 
     fun getProducts() {
         viewModelScope.launch {
@@ -27,6 +29,13 @@ class ProductViewModel @Inject constructor(private val productRepository: Produc
                 _products.update { NetworkUtils.resolveError(e) }
             }
         }
+    }
+
+    fun addProduct(product: Product) {
+        val updatedList = ((products.value as State.DataState<*>).data as ProductResponse)
+        updatedList.add(product)
+        _products.update { State.LoadingState }
+        _products.update { State.DataState(updatedList) }
     }
 
 }
